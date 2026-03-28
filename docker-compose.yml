@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: leads-db-container
+    restart: always
+    environment:
+      POSTGRES_USER: user_leads
+      POSTGRES_PASSWORD: password_123
+      POSTGRES_DB: leads_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_leads_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_leads_data:
