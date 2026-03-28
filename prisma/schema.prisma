@@ -5,3 +5,26 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Fuente {
+  instagram
+  facebook
+  landing_page
+  referido
+  otro
+}
+
+model Lead {
+  id              String   @id @default(cuid())
+  nombre          String
+  email           String   @unique
+  telefono        String?
+  fuente          Fuente
+  productoInteres String?  @map("producto_interes")
+  presupuesto     Float?
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("leads")
+}

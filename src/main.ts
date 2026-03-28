@@ -1,24 +1,20 @@
-// src/main.ts
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+// import { ThrottlerGuard } from '@nestjs/throttler';
+import { Reflector } from '@nestjs/core';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const allowedOrigins = ['http://localhost:5173'];
+  app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS no permitido para ${origin}`));
-      }
-    },
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
   });
 
   app.useGlobalPipes(
@@ -29,12 +25,30 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  const config = new DocumentBuilder()
+    .setTitle('Leads API — One Million Copy SAS')
+    .setDescription(
+      'API REST para gestión de leads de marketing digital. ' +
+        'Los endpoints de escritura requieren el header **x-api-key**.',
+    )
+    .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
+    .addTag('Leads', 'Operaciones CRUD y estadísticas de leads')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(
-    `API listening on http://localhost:${port} (CORS: ${allowedOrigins.join(', ')})`,
-  );
+
+  console.log(`\n🚀 Leads API corriendo en: http://localhost:${port}/api`);
+  console.log(`📖 Swagger UI:             http://localhost:${port}/api/docs`);
+  // console.log(`🔑 Rate limit:             60 req/min por IP\n`);
 }
 
 bootstrap();

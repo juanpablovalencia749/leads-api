@@ -11,6 +11,26 @@ services:
       - "5432:5432"
     volumes:
       - postgres_leads_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_leads -d leads_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: leads-api-container
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://user_leads:password_123@db:5432/leads_db?schema=public
+      PORT: 3000
+      API_KEY: ${API_KEY:-super_secret_api_key_change_me}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_leads_data:
