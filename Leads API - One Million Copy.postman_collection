@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "4cee2483-db60-46fb-aacd-72c6d01fa7c4",
+    "name": "Leads API - One Million Copy",
+    "description": "Colección para probar el backend de gestión de leads. Requiere el header 'x-api-key' para operaciones de escritura.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25440116"
+  },
+  "item": [
+    {
+      "name": "Leads",
+      "item": [
+        {
+          "name": "Listar Leads",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// for (let i = 0; i < 70; i++) {\r",
+                  "//   pm.sendRequest(\"http://localhost:3000/api/leads\", function (err, res) {\r",
+                  "//     console.log(res.code);\r",
+                  "//   });\r",
+                  "// }"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Lead por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cmnap854u000bwk5y34ag7x62",
+                  "description": "ID del lead"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Lead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"El que vamos a eliminar\",\n  \"email\": \"eliminar2@example.com\",\n  \"telefono\": \"+57 300 111 2222\",\n  \"fuente\": \"instagram\",\n  \"productoInteres\": \"Curso de eliminar\",\n  \"presupuesto\": 252\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/leads",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Lead",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Rodríguez Molina\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cmnap854u000bwk5y34ag7x62"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Lead",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cmnaqpgob0000435yuhwul6kc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estadísticas de Leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generar Resumen IA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"promptCustom\": \"Resume los leads con mayor presupuesto registrados esta semana.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/ai/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "leads",
+                "ai",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "tu_api_key_aqui",
+      "type": "string"
+    }
+  ]
+}
