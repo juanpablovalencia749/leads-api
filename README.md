@@ -45,6 +45,7 @@ leads-api/
 ## 🛠️ Requisitos Previos
 
 Asegúrate de tener instalado en tu máquina lo siguiente:
+
 - **Node.js**: v18+
 - **PostgreSQL**: corriendo localmente o mediante Docker (ver `docker-compose.yml`).
 
@@ -53,12 +54,14 @@ Asegúrate de tener instalado en tu máquina lo siguiente:
 ## ⚙️ Configuración y Ejecución
 
 **1. Instalar dependencias**
+
 ```bash
 npm install
 ```
 
 **2. Variables de Entorno**
 Crea un archivo `.env` en la raíz del proyecto basándote en un archivo `.env.example` (en caso de existir) e incluye:
+
 ```env
 # URL de conexión a tu Base de datos PostgreSQL local
 DATABASE_URL="postgresql://USUARIO:PASSWORD@localhost:5432/leads_db?schema=public"
@@ -72,27 +75,32 @@ OPENAI_API_KEY="sk-proj-xxxxxxxx..."
 ```
 
 **3. Levantar la base de datos (Opcional si usas Docker)**
+
 ```bash
 docker-compose up -d
 ```
 
 **4. Aplicar Migraciones en Base de Datos**
 Alinea la BD con tu esquema de Prisma.
+
 ```bash
 npx prisma migrate dev
 ```
 
 **5. Llenar base de datos con prueba (Seed)**
 Ejecuta el script incluido que generará 50 leads de forma automática en tu PostgreSQL:
+
 ```bash
 npm run seed
 ```
 
 **6. Ejecutar la Aplicación**
+
 ```bash
 # Modo de desarrollo con auto recarga
 npm run start:dev
 ```
+
 La aplicación correrá en: `http://localhost:3000/api`
 La documentación Swagger la encontrarás en: `http://localhost:3000/api/docs`
 
@@ -105,31 +113,36 @@ La aplicación tiene una excelente protección contra ataques DDoS y de fuerza b
 Existen 2 maneras muy sencillas de probar y verificar que este error `429 Too Many Requests` efectivamente funcione:
 
 ### Opción 1: A través de Postman
-Puedes añadir un script en Postman para simular ráfagas de pruebas. 
+
+Puedes añadir un script en Postman para simular ráfagas de pruebas.
+
 1. Abre tu **Postman**.
 2. Dale click al endpoint por ejemplo: **`Listar Leads`**.
 3. Navega a la pestaña de **"Pre-request Script"** y pega el siguiente código:
    ```javascript
    for (let i = 0; i < 70; i++) {
-     pm.sendRequest("http://localhost:3000/api/leads", function (err, res) {
-       console.log(res.code);  // Verás códigos 200, hasta que cambie a 429
+     pm.sendRequest('http://localhost:3000/api/leads', function (err, res) {
+       console.log(res.code); // Verás códigos 200, hasta que cambie a 429
      });
    }
    ```
 4. Dale a **Send**. Verás en la "Postman Console" cómo las primeras peticiones responden con un código HTTP exitoso y luego empiezan a saltar errores o bien el request principal caerá en HTTP 429.
 
 ### Opción 2: A través de la Consola / Terminal (Curl)
+
 Puedes ejecutar este ciclo en sistemas basados en Bash/Zsh para hacer 70 intentos consecutivos y notar en pantalla el bloqueo tras la petición número 60:
+
 ```bash
 for i in {1..70}; do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/api/leads; done
 ```
-*Tip: El comando está configurado para mostrar solo en qué código HTTP responde cada petición, deberías visualizar un montón de `200` y luego el bloqueo en respuesta `429`.*
+
+_Tip: El comando está configurado para mostrar solo en qué código HTTP responde cada petición, deberías visualizar un montón de `200` y luego el bloqueo en respuesta `429`._
 
 ---
 
 ## 📫 Probar en Postman
 
-Incluimos un archivo listo para que puedas importar a tu Postman: `postman_collection.json`. 
+Incluimos un archivo listo para que puedas importar a tu Postman: `Leads API - One Million Copy.postman_collection`.
 
 1. Abre tu Postman.
 2. Clic en **Import** y selecciona el archivo mencionado en la raíz.
