@@ -5,7 +5,6 @@ import { AiService } from '../ai/ai.service';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Fuente } from '@prisma/client';
 
-// ─── Mock de PrismaService ───────────────────────────────────────────────────
 const mockPrisma = {
   lead: {
     findUnique: jest.fn(),
@@ -20,7 +19,6 @@ const mockPrisma = {
   },
 };
 
-// ─── Mock de AiService ────────────────────────────────────────────────────────
 const mockAiService = {
   generateSummary: jest.fn().mockResolvedValue({
     resumen: '[MOCK] Resumen de prueba',
@@ -29,7 +27,6 @@ const mockAiService = {
   }),
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 const makeLead = (overrides = {}) => ({
   id: 'cuid-001',
   nombre: 'Ana Torres',
@@ -60,8 +57,6 @@ describe('LeadsService', () => {
     jest.clearAllMocks();
   });
 
-  // ─── TEST 1: create — happy path ────────────────────────────────────────────
-
   describe('create', () => {
     it('should create a lead when email is unique', async () => {
       const dto = {
@@ -83,8 +78,6 @@ describe('LeadsService', () => {
       expect(result.email).toBe('ana@test.com');
     });
 
-    // ─── TEST 2: create — email duplicado ──────────────────────────────────────
-
     it('should throw ConflictException when email already exists', async () => {
       mockPrisma.lead.findUnique.mockResolvedValue(makeLead());
 
@@ -98,11 +91,12 @@ describe('LeadsService', () => {
     });
   });
 
-  // ─── TEST 3: findAll — paginación y filtros ─────────────────────────────────
-
   describe('findAll', () => {
     it('should return paginated leads with correct meta', async () => {
-      const leads = [makeLead(), makeLead({ id: 'cuid-002', email: 'b@b.com' })];
+      const leads = [
+        makeLead(),
+        makeLead({ id: 'cuid-002', email: 'b@b.com' }),
+      ];
       mockPrisma.lead.findMany.mockResolvedValue(leads);
       mockPrisma.lead.count.mockResolvedValue(2);
 
@@ -118,13 +112,11 @@ describe('LeadsService', () => {
     });
   });
 
-  // ─── TEST 4: getStats ───────────────────────────────────────────────────────
-
   describe('getStats', () => {
     it('should return stats object with correct shape', async () => {
       mockPrisma.lead.count
-        .mockResolvedValueOnce(10)   // total
-        .mockResolvedValueOnce(3);   // ultimos7dias
+        .mockResolvedValueOnce(10) // total
+        .mockResolvedValueOnce(3); // ultimos7dias
 
       mockPrisma.lead.groupBy.mockResolvedValue([
         { fuente: Fuente.instagram, _count: { fuente: 5 } },
@@ -141,23 +133,29 @@ describe('LeadsService', () => {
       expect(stats).toHaveProperty('ultimos7dias', 3);
       expect(stats).toHaveProperty('promedioPres', 275.5);
       expect(stats.porFuente).toHaveLength(2);
-      expect(stats.porFuente[0]).toEqual({ fuente: Fuente.instagram, cantidad: 5 });
+      expect(stats.porFuente[0]).toEqual({
+        fuente: Fuente.instagram,
+        cantidad: 5,
+      });
     });
   });
-
-  // ─── TEST 5: softDelete — lead no encontrado ────────────────────────────────
 
   describe('softDelete', () => {
     it('should throw NotFoundException when lead does not exist', async () => {
       mockPrisma.lead.findFirst.mockResolvedValue(null);
 
-      await expect(service.softDelete('bad-id')).rejects.toThrow(NotFoundException);
+      await expect(service.softDelete('bad-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should soft-delete an existing lead by setting deletedAt', async () => {
       const lead = makeLead();
       mockPrisma.lead.findFirst.mockResolvedValue(lead);
-      mockPrisma.lead.update.mockResolvedValue({ ...lead, deletedAt: new Date() });
+      mockPrisma.lead.update.mockResolvedValue({
+        ...lead,
+        deletedAt: new Date(),
+      });
 
       const result = await service.softDelete('cuid-001');
 

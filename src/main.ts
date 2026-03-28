@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-// import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { Reflector } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -48,7 +48,7 @@ async function bootstrap() {
 
   console.log(`\n🚀 Leads API corriendo en: http://localhost:${port}/api`);
   console.log(`📖 Swagger UI:             http://localhost:${port}/api/docs`);
-  // console.log(`🔑 Rate limit:             60 req/min por IP\n`);
+  console.log(`🔑 Rate limit:             60 req/min por IP\n`);
 }
 
 bootstrap();

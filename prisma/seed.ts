@@ -1,131 +1,101 @@
+import 'dotenv/config';
 import { PrismaClient, Fuente } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import 'dotenv/config';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-const leadsData = [
-  {
-    nombre: 'Ana Torres',
-    email: 'ana.torres@gmail.com',
-    telefono: '+57 300 111 2222',
-    fuente: Fuente.instagram,
-    productoInteres: 'Curso de Marketing Digital',
-    presupuesto: 250,
-  },
-  {
-    nombre: 'Carlos Mendez',
-    email: 'carlosm@hotmail.com',
-    telefono: '+57 310 333 4444',
-    fuente: Fuente.facebook,
-    productoInteres: 'Membresía Premium',
-    presupuesto: 150,
-  },
-  {
-    nombre: 'Valentina Ríos',
-    email: 'vrios@empresa.co',
-    telefono: '+57 315 555 6666',
-    fuente: Fuente.landing_page,
-    productoInteres: 'Ebook de Ventas',
-    presupuesto: 50,
-  },
-  {
-    nombre: 'Juan Pablo Gómez',
-    email: 'jpgomez@correo.com',
-    telefono: null,
-    fuente: Fuente.referido,
-    productoInteres: 'Consultoría 1:1',
-    presupuesto: 500,
-  },
-  {
-    nombre: 'María Fernanda Castillo',
-    email: 'mfcastillo@gmail.com',
-    telefono: '+57 320 777 8888',
-    fuente: Fuente.instagram,
-    productoInteres: 'Curso de Copywriting',
-    presupuesto: 300,
-  },
-  {
-    nombre: 'Sergio Vargas',
-    email: 'svargas@negocios.net',
-    telefono: '+57 300 999 0000',
-    fuente: Fuente.facebook,
-    productoInteres: null,
-    presupuesto: null,
-  },
-  {
-    nombre: 'Laura Quintero',
-    email: 'lauraq@email.com',
-    telefono: null,
-    fuente: Fuente.landing_page,
-    productoInteres: 'Taller de Embudos',
-    presupuesto: 200,
-  },
-  {
-    nombre: 'Andrés Felipe Mora',
-    email: 'afmora@startup.io',
-    telefono: '+57 318 111 2222',
-    fuente: Fuente.otro,
-    productoInteres: 'Acceso a Comunidad',
-    presupuesto: 80,
-  },
-  {
-    nombre: 'Daniela Ospina',
-    email: 'dospina@mail.com',
-    telefono: '+57 311 333 4444',
-    fuente: Fuente.referido,
-    productoInteres: 'Mentoría Grupal',
-    presupuesto: 400,
-  },
-  {
-    nombre: 'Roberto Salazar',
-    email: 'rsalazar@biz.com',
-    telefono: '+57 312 555 6666',
-    fuente: Fuente.instagram,
-    productoInteres: 'Curso de Automatización',
-    presupuesto: 350,
-  },
-  {
-    nombre: 'Paola Herrera',
-    email: 'pherrera@works.co',
-    telefono: null,
-    fuente: Fuente.facebook,
-    productoInteres: 'Webinar Gratuito',
-    presupuesto: 0,
-  },
-  {
-    nombre: 'Esteban Cruz',
-    email: 'ecruz@digital.com',
-    telefono: '+57 316 777 8888',
-    fuente: Fuente.landing_page,
-    productoInteres: 'Pack Completo de Cursos',
-    presupuesto: 700,
-  },
+const nombres = [
+  'Ana',
+  'Carlos',
+  'David',
+  'Laura',
+  'María',
+  'Jorge',
+  'Sofía',
+  'Daniel',
+  'Valentina',
+  'Andrés',
 ];
+const apellidos = [
+  'García',
+  'Martínez',
+  'López',
+  'González',
+  'Pérez',
+  'Rodríguez',
+  'Gómez',
+  'Fernández',
+  'Díaz',
+  'Torres',
+];
+const productos = [
+  'Curso de Marketing',
+  'Diplomado en IA',
+  'Maestría en Ventas',
+  'Taller de Finanzas',
+  'Asesoría Empresarial',
+];
+const fuentes = Object.values(Fuente);
+
+function getRandomElement<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function getRandomPhoneNumber(): string {
+  const prefix = getRandomElement(['+57', '+52', '+34', '+1', '+54']);
+  const number = Math.floor(Math.random() * 9000000000) + 1000000000;
+  return `${prefix} ${number}`;
+}
+
+function getRandomPresupuesto(): number | null {
+  if (Math.random() < 0.2) return null;
+  return Math.floor(Math.random() * 98 + 2) * 50;
+}
 
 async function main() {
-  console.log('🚀 Iniciando seeding...');
+  console.log('🌱 Iniciando la creación de leads de prueba...');
 
-  // Limpiar tabla antes de seed
-  await prisma.lead.deleteMany({});
+  const leadsData = Array.from({ length: 50 }).map((_, index) => {
+    const nombre = `${getRandomElement(nombres)} ${getRandomElement(apellidos)}`;
+    const email = `lead_test_${Date.now()}_${index}@example.com`;
+    const telefono = getRandomPhoneNumber();
+    const fuente = getRandomElement(fuentes);
+    const productoInteres =
+      Math.random() < 0.8 ? getRandomElement(productos) : null;
+    const presupuesto = getRandomPresupuesto();
 
-  for (const lead of leadsData) {
-    const created = await prisma.lead.create({ data: lead });
-    console.log(`  ✅ Lead creado: ${created.nombre} (${created.email})`);
-  }
+    const createdAt = new Date();
+    createdAt.setDate(createdAt.getDate() - Math.floor(Math.random() * 30));
 
-  console.log(`\n🎉 Seed completado: ${leadsData.length} leads insertados.`);
+    return {
+      nombre,
+      email,
+      telefono,
+      fuente,
+      productoInteres,
+      presupuesto,
+      createdAt,
+      updatedAt: createdAt,
+    };
+  });
+
+  const createdLeads = await prisma.lead.createMany({
+    data: leadsData,
+  });
+
+  console.log(
+    `✅ ¡Se crearon ${createdLeads.count} leads de prueba con éxito!`,
+  );
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error en el seed:', e);
+    console.error('❌ Error ejecutando el seed:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
